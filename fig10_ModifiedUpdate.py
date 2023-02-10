@@ -366,7 +366,7 @@ def plot_figure():
         ecolor='red', color = 'salmon', mfc = 'white', elinewidth=1, capsize=4, markeredgecolor = 'red', markersize = 10, markeredgewidth=0.8, label = r'$\gamma = 32\#W$'
         )
     #ax.legend(loc = (0.54, 0.54))
-    #ax.legend()
+    ax.legend()
     ax.set_xlabel(r'UP ($\%$)')
     #ax.set_xlabel(r'Update Percentage ($\%$, #Upd/#TotF)')
     ax.set_ylabel('Recovery rate')
@@ -377,10 +377,10 @@ def plot_figure():
 
 if __name__=='__main__':
     
-    d_id = input("input update operations: 1. All Add 2. Uniform 3. All Delete ")
-    if d_id=='1':
+    d_id2 = input("input update operations: 1. All Add 2. Uniform 3. All Delete ")
+    if d_id2=='1':
         update_dis = 'AllAdd'
-    elif d_id=='2':
+    elif d_id2=='2':
         update_dis = 'Uniform'
     else:
         update_dis = 'AllDelete'
