@@ -41,9 +41,6 @@ elif d_id=='3':
 else:
     raise ValueError('No Selected Dataset!!!')
 
-update_dis = 'AllAdd'
-
-
 """ read data """
 with open(os.path.join(utils.DATASET_PATH,"{}_doc.pkl".format(dataset_name.lower())), "rb") as f:
     docu = pickle.load(f)
@@ -60,10 +57,11 @@ EXP_TIM = 5
 
 
 class Attack: 
-    def __init__(self, kw_to_id, real_doc, sample_doc, min_file_size, max_file_size, update_percentage_with_injectoion, chosen_kws, observed_queries, target_queries, kws_leak_percent, trend_matrix_norm, real_size, real_length, offset_of_Decoding):
+    def __init__(self, kw_to_id, real_doc, sample_doc, min_file_size, max_file_size, update_percentage_with_injectoion, chosen_kws, observed_queries, target_queries, kws_leak_percent, trend_matrix_norm, real_size, real_length, offset_of_Decoding, up_dis):
         self.real_tag = {}
         self.recover_tag = {}
 
+        self.up_dis = up_dis
         self.setup_bandwidth = 0
         self.update_bandwidth = 0
         self.query_bandwidth = 0
@@ -149,9 +147,9 @@ class Attack:
         update_count = (int) (self.update_percentage_with_injectoion*len(self.real_doc))
         #print(update_count)
         for _ in range(update_count):    
-            if update_dis=='AllAdd':
+            if self.up_dis=='AllAdd':
                 op = 'add'
-            elif update_dis=='Uniform':
+            elif self.up_dis=='Uniform':
                 op = random.choice(operation_type)
             else:
                 op = 'delete'     
@@ -284,7 +282,7 @@ class Attack:
                     #real_size_after_injection[kws_ind] += size_each_doc[num_ind]       
         #self.get_size_and_length_after_injection(injection_length, injection_size)
 
-def process(kw_dict, chosen_kws, docu, adv_observed_offset, observed_period, target_period, number_queries_per_period, kw_to_id, Gama_Update):
+def process(kw_dict, chosen_kws, docu, adv_observed_offset, observed_period, target_period, number_queries_per_period, kw_to_id, update_dis, Gama_Update):
 
     random.shuffle(docu)
     real_doc = docu[:(int)(len(docu)/2)]
@@ -298,7 +296,7 @@ def process(kw_dict, chosen_kws, docu, adv_observed_offset, observed_period, tar
     observed_queries = utils.generate_queries(trend_matrix[:, begin_time:begin_time+observed_period], 'real-world', number_queries_per_period)
     target_queries = utils.generate_queries(trend_matrix[:, begin_time+observed_period:begin_time+observed_period+target_period], 'real-world', number_queries_per_period)
     kws_leak_percent = 1
-    UPDATE = Attack(kw_to_id, real_doc, sample_doc, min_file_size, max_file_size, Gama_Update[1], chosen_kws, observed_queries, target_queries, kws_leak_percent, trend_matrix, real_size, real_length, offset_of_Decoding)
+    UPDATE = Attack(kw_to_id, real_doc, sample_doc, min_file_size, max_file_size, Gama_Update[1], chosen_kws, observed_queries, target_queries, kws_leak_percent, trend_matrix, real_size, real_length, offset_of_Decoding, update_dis)
 
     UPDATE.BVA_main(Gama_Update[0])
     BVA_acc = UPDATE.accuracy
@@ -403,7 +401,7 @@ if __name__=='__main__':
         for ind2 in range(len(UP_PER)):
             tmptmp = []
             Gama_Update_List = [(Gamma_of_BVA[ind], UP_PER[ind2])]*30
-            partial_function = partial(process, kw_dict, chosen_kws, docu, adv_observed_offset, observed_period, target_period, number_queries_per_period, kw_to_id)
+            partial_function = partial(process, kw_dict, chosen_kws, docu, adv_observed_offset, observed_period, target_period, number_queries_per_period, kw_to_id, update_dis)
             with Pool(processes=exp_times) as pool:
                 for result in pool.map(partial_function, Gama_Update_List):
                     #BVA_final_acc[ind][ind2].append(result[0])
