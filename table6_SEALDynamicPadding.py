@@ -594,7 +594,7 @@ def multiprocess_worker(kw_dict, chosen_kws, docu, xx, adv_observed_offset, obse
 
 if __name__=='__main__': 
    
-    SEALx = [0, 2, 3, 4] #, 16 
+    SEALx = [0, 2, 4, 16] #, 16 
     #Cluster_acc = []
     BVA_acc = []
     BVMA_acc = []
